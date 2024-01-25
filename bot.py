@@ -2,7 +2,8 @@ import nextcord
 from nextcord.ext import commands
 
 class SCPBot:
-    Bot = commands.Bot(command_prefix="?", intents=nextcord.Intents.all())
+    CommandPrefix = "?"
+    Bot = commands.Bot(command_prefix=CommandPrefix, intents=nextcord.Intents.all())
 
     @Bot.event
     async def on_ready():
@@ -12,12 +13,12 @@ class SCPBot:
     async def exit(ctx):
         await ctx.send("bye nigger")
         await SCPBot.Bot.close()
-
-
-class CustomHelp(commands.HelpCommand):
-    async def send_bot_help(self, mapping):
-        command_list = [*mapping.values()][0]
-        longest = max(map(lambda x:len(x.name), command_list))
-        await self.get_destination().send("```{}```".format('\n'.join([f'{i.name:<{longest+5}}{i.short_doc}' for i in command_list])))
         
-SCPBot.Bot.help_command = CustomHelp()
+        
+SCPBot.Bot.remove_command('help')
+@SCPBot.Bot.command(help="Shows this message")
+async def help(ctx):
+    menu = nextcord.Embed(title="Commands", color=nextcord.Color.blue())
+    menu.add_field(name="", value="\n\n".join([f"**{SCPBot.CommandPrefix}{i.name}**\n{i.help}" for i in SCPBot.Bot.commands]))
+    menu.set_footer(text=ctx.guild.name)
+    await ctx.send(embed=menu)
