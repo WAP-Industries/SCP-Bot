@@ -8,7 +8,7 @@ class SCPBot:
     async def on_ready():
         print("im running nigger")
 
-    @Bot.command(help="closes the bot")
+    @Bot.command(help="Closes the bot")
     async def exit(ctx):
         await ctx.send("bye nigger")
         await SCPBot.Bot.close()
