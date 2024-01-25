@@ -6,7 +6,7 @@ from bot import *
 
 def main():
     __import__("dotenv").load_dotenv()
-    SCPBot.Bot.run(''.join(map(lambda x: chr(ord(x)-int(os.environ.get("ENC"))), os.environ.get("TOK"))))
+    SCPBot.Bot.run(''.join(chr(ord(i)-int(os.environ.get("ENC"))) for i in os.environ.get("TOK")))
 
 
 if __name__=="__main__":
