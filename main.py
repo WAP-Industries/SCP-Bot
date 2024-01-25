@@ -1,5 +1,4 @@
-import sys
-sys.dont_write_bytecode = True
+__import__("sys").dont_write_bytecode = True
 
 import os
 from bot import *
