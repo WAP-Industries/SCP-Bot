@@ -5,7 +5,7 @@ from bot import *
 
 def main():
     __import__("dotenv").load_dotenv()
-    SCPBot.Bot.run(''.join(chr(ord(i)-int(os.environ.get("ENC"))) for i in os.environ.get("TOK")))
+    BRBot.Bot.run(''.join(chr(ord(i)-int(os.environ.get("ENC"))) for i in os.environ.get("TOK")))
 
 
 if __name__=="__main__":

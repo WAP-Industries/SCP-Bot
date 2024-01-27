@@ -1,24 +1,33 @@
-import nextcord
-from nextcord.ext import commands
+from game import *
 
-class SCPBot:
-    CommandPrefix = "?"
-    Bot = commands.Bot(command_prefix=CommandPrefix, intents=nextcord.Intents.all())
+class BRBot:
+  CommandPrefix = "?"
+  Bot = commands.Bot(command_prefix=CommandPrefix, intents=nextcord.Intents.all())
+  Games = []
 
-    @Bot.event
-    async def on_ready():
-        print("im running nigger")
+  @staticmethod
+  def CreateEmbed(title: str):
+        return nextcord.Embed(title=title, color=nextcord.Color(0x2c2c34))
 
-    @Bot.command(help="Closes the bot")
-    async def exit(ctx):
-        await ctx.send("bye nigger")
-        await SCPBot.Bot.close()
+  @Bot.event
+  async def on_ready():
+    print("im running nigger")
 
-        
-SCPBot.Bot.remove_command('help')
-@SCPBot.Bot.command(help="Shows this message")
-async def help(ctx):
-    menu = nextcord.Embed(title="Commands", color=nextcord.Color.blue())
-    menu.add_field(value="\n\n".join([f"**{SCPBot.CommandPrefix}{i.name}**\n{i.help}" for i in SCPBot.Bot.commands]))
-    menu.set_footer(text=ctx.guild.name)
-    await ctx.send(embed=menu)
+  @Bot.command(help="Closes the bot")
+  async def exit(ctx: commands.Context):
+    await ctx.send("bye nigger")
+    await BRBot.Bot.close()
+
+  @Bot.command()
+  async def play(ctx: commands.Context, user: nextcord.Member):
+    game = Game(ctx.author, user, await ctx.send(f"`{Settings.LoadingMessage}`"))
+    await game.UpdateDisplay()
+    BRBot.Games.append(game)
+
+
+BRBot.Bot.remove_command("help")
+@BRBot.Bot.command(help="Shows this message")
+async def help(ctx: commands.Context):
+  menu = BRBot.CreateEmbed("Commands")
+  menu.add_field(name="", value="\n\n".join([f"**{BRBot.CommandPrefix}{i.name}**\n{i.help}" for i in BRBot.Bot.commands]))
+  await ctx.send(embed=menu)
