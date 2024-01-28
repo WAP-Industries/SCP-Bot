@@ -1,5 +1,7 @@
 class Settings:
-    LoadingMessage="Creating game..."
+    class Messages:
+        NewGame = "Creating game"
+        LoadOptions = "Loading options"
     
     RoundConfig = [
         None,

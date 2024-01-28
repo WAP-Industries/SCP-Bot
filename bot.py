@@ -20,8 +20,9 @@ class BRBot:
 
   @Bot.command()
   async def play(ctx: commands.Context, user: nextcord.Member):
-    game = Game(ctx.author, user, await ctx.send(f"`{Settings.LoadingMessage}`"))
+    game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
     await game.UpdateDisplay()
+    await game.Message.AddButton("Play", "⏯", game.Play)
     BRBot.Games.append(game)
 
 
