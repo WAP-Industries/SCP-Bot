@@ -13,10 +13,9 @@ class Player:
 
 class GameInfo:
     def __init__(self):
-        self.Round = 1
+        self.Round = 0
         self.Turn = None
-        self.Gun = Settings.RoundConfig[self.Round]
-        random.shuffle(self.Gun)
+        self.Gun = []
 
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
@@ -24,6 +23,7 @@ class Game:
         self.Players = [self.Player1, self.Player2]
         self.Info = GameInfo()
         self.Message = Utils.Message(message)
+        self.Dialogue = ""
         
         class B:
             Play = self.ButtonPlay
@@ -33,18 +33,25 @@ class Game:
     @staticmethod
     def DebugMessage(text):
         return f"`{text}...`"
-    
-    @staticmethod
-    async def StartRound(p1: nextcord.Member, p2: nextcord.Member):
-        game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
-        await game.UpdateDisplay()
-        await game.UpdateDialogue(f"{game.Info.Gun.count(1)} lives. {game.Info.Gun.count(0)} blanks.")
-        sleep(Settings.DialogueInterval)
-        await game.Message.AddButton("Play", "⏯", game.Buttons.Play)
-        game.Info.Turn = game.Player1
-        await game.UpdateDialogue(f"{game.Info.Turn.Name} starts!")
+
+    async def StartRound(self):
+        self.Info.Round+=1
+        self.Info.Gun = Settings.RoundConfig[self.Info.Round]
+        random.shuffle(self.Info.Gun)
+        self.Info.Turn = self.Player1
+
+        await self.UpdateDisplay()
+        for i in [
+            f"Round {self.Info.Round}",
+            f"{self.Info.Gun.count(1)} lives. {self.Info.Gun.count(0)} blanks.",
+            f"{self.Info.Turn.Name} starts!"
+        ]:
+            await self.UpdateDialogue(i)
+            sleep(Settings.DialogueInterval)
+        await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
     async def UpdateDialogue(self, text):
+        self.Dialogue = text
         self.Message.Embed.set_footer(text=text)
         await self.Message.Reference.edit(content="", embed=self.Message.Embed)
 
@@ -62,6 +69,7 @@ class Game:
             value = "\n\n".join(['**{}**\n{}'.format(i.Name, "".join("\u258D" for _ in range(i.Health))) for i in self.Players]),
             inline=False
         )
+        display.set_footer(text=self.Dialogue)
         AddBlank(display)
         self.Message.Embed = display
         await self.Message.Reference.edit(content="", embed=display)

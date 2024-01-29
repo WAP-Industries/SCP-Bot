@@ -21,13 +21,7 @@ class BRBot:
   @Bot.command()
   async def play(ctx: commands.Context, user: nextcord.Member):
     game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
-    await game.UpdateDisplay()
-    await game.UpdateDialogue(f"{game.Info.Gun.count(1)} lives. {game.Info.Gun.count(0)} blanks.")
-    sleep(Settings.DialogueInterval)
-    await game.Message.AddButton("Play", "⏯", game.Buttons.Play)
-    game.Info.Turn = game.Player1
-    await game.UpdateDialogue(f"{game.Info.Turn.Name} starts!")
-    BRBot.Games.append(game)
+    await game.StartRound()
 
 
 BRBot.Bot.remove_command("help")
