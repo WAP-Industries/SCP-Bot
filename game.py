@@ -23,7 +23,6 @@ class Game:
         self.Players = [self.Player1, self.Player2]
         self.Info = GameInfo()
         self.Message = Utils.Message(message)
-        self.Dialogue = ""
         
         class B:
             Play = self.ButtonPlay
@@ -51,7 +50,6 @@ class Game:
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
     async def UpdateDialogue(self, text):
-        self.Dialogue = text
         self.Message.Embed.set_footer(text=text)
         await self.Message.Reference.edit(content="", embed=self.Message.Embed)
 
@@ -69,7 +67,7 @@ class Game:
             value = "\n\n".join(['**{}**\n{}'.format(i.Name, "".join("\u258D" for _ in range(i.Health))) for i in self.Players]),
             inline=False
         )
-        display.set_footer(text=self.Dialogue)
+        display.set_footer(text=(self.Message.Embed.footer.text or Utils.Blank) if self.Message.Embed else Utils.Blank)
         AddBlank(display)
         self.Message.Embed = display
         await self.Message.Reference.edit(content="", embed=display)
