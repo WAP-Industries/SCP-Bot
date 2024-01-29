@@ -25,7 +25,6 @@ class BRBot:
     await game.UpdateDialogue(f"{game.Info.Gun.count(1)} lives. {game.Info.Gun.count(0)} blanks.")
     sleep(Settings.DialogueInterval)
     await game.Message.AddButton("Play", "⏯", game.Buttons.Play)
-    # game.Info.Turn = random.choice(game.Players)
     game.Info.Turn = game.Player1
     await game.UpdateDialogue(f"{game.Info.Turn.Name} starts!")
     BRBot.Games.append(game)

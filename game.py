@@ -33,6 +33,16 @@ class Game:
     @staticmethod
     def DebugMessage(text):
         return f"`{text}...`"
+    
+    @staticmethod
+    async def StartRound(p1: nextcord.Member, p2: nextcord.Member):
+        game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
+        await game.UpdateDisplay()
+        await game.UpdateDialogue(f"{game.Info.Gun.count(1)} lives. {game.Info.Gun.count(0)} blanks.")
+        sleep(Settings.DialogueInterval)
+        await game.Message.AddButton("Play", "⏯", game.Buttons.Play)
+        game.Info.Turn = game.Player1
+        await game.UpdateDialogue(f"{game.Info.Turn.Name} starts!")
 
     async def UpdateDialogue(self, text):
         self.Message.Embed.set_footer(text=text)
