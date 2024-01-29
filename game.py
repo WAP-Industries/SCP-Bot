@@ -49,7 +49,7 @@ class Game:
             sleep(Settings.DialogueInterval)
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
-    async def UpdateDialogue(self, text):
+    async def UpdateDialogue(self, text: str):
         self.Message.Embed.set_footer(text=text)
         await self.Message.Reference.edit(content="", embed=self.Message.Embed)
 
@@ -78,6 +78,10 @@ class Game:
         await self.UpdateDisplay()
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
         sleep(Settings.DialogueInterval)
+
+        if not len(self.Info.Gun):
+            return await self.StartRound()
+
         self.Info.Turn = [i for i in self.Players if i!=self.Info.Turn][0]
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
 
@@ -95,10 +99,16 @@ class Game:
         current = self.Player1 if self.Player1.User==interaction.user else self.Player2
         enemy = self.Player2 if current==self.Player1 else self.Player2
 
+        async def ClearButton():
+            self.Message.View.clear_items()
+            await self.Message.Update()
+
         async def c(_):
+            await ClearButton()
             await interaction.edit_original_message(content=Utils.Blank, view=None)
             await self.Shoot(current)
         async def e(_):
+            await ClearButton()
             await interaction.edit_original_message(content=Utils.Blank, view=None)
             await self.Shoot(enemy)
 
