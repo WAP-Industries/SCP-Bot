@@ -2,6 +2,9 @@ class Settings:
     class Messages:
         NewGame = "Creating game"
         LoadOptions = "Loading options"
+        NotTurn = "Wait for your turn, nigger."
+
+    DialogueInterval = 2
     
     RoundConfig = [
         None,
