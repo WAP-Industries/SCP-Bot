@@ -50,6 +50,8 @@ class Game:
         await message.AddButton("Shoot", "🔫", self.Shoot)
 
     async def Shoot(self, interaction: nextcord.Interaction):
-        message = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
-        await message.AddButton("Yourself", "🤓", lambda _:0)
-        await message.AddButton([i for i in self.Players if i.User!=interaction.user][0].User.name, "😈", lambda _:0)
+        await interaction.response.defer()
+        message = Utils.Message(await interaction.original_message())
+        await interaction.edit_original_message(content=chr(173), view=None)
+        await message.AddButton("Yourself", "🤓", lambda _: 0)
+        await message.AddButton([i for i in self.Players if i.User!=interaction.user][0].User.name, "😈", lambda _: 0)
