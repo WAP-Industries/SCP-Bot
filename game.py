@@ -35,7 +35,7 @@ class Game:
 
     async def StartRound(self):
         self.Info.Round+=1
-        self.Info.Gun = [*Settings.RoundConfig[self.Info.Round]]
+        self.Info.Gun = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
         random.shuffle(self.Info.Gun)
         self.Info.Turn = self.Player1
 
