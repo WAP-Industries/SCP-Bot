@@ -12,3 +12,5 @@ class Settings:
         [1]*3+[0]*4,
         [1]*4+[0]*5,
     ]
+
+    PlayerHealth = 5

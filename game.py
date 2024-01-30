@@ -6,10 +6,10 @@ from utils import *
 
 
 class Player:
-    def __init__(self, user: nextcord.Member, health: int=5):
+    def __init__(self, user: nextcord.Member):
         self.User = user
         self.Name = user.name
-        self.Health = health
+        self.Health = Settings.PlayerHealth
 
 class GameInfo:
     def __init__(self):
@@ -35,7 +35,7 @@ class Game:
 
     async def StartRound(self):
         self.Info.Round+=1
-        self.Info.Gun = Settings.RoundConfig[self.Info.Round]
+        self.Info.Gun = [*Settings.RoundConfig[self.Info.Round]]
         random.shuffle(self.Info.Gun)
         self.Info.Turn = self.Player1
 
@@ -48,6 +48,9 @@ class Game:
             await self.UpdateDialogue(i)
             sleep(Settings.DialogueInterval)
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
+
+    async def EndGame(self, winner: Player):
+        await self.UpdateDialogue(f"{winner.Name} wins!")
 
     async def UpdateDialogue(self, text: str):
         self.Message.Embed.set_footer(text=text)
@@ -64,7 +67,7 @@ class Game:
         AddBlank(display)
         display.add_field( 
             name="",
-            value = "\n\n".join(['**{}**\n{}'.format(i.Name, "".join("\u258D" for _ in range(i.Health))) for i in self.Players]),
+            value = "\n\n".join(['**{}**\n{}'.format(i.Name, "".join("\u258D" for _ in range(i.Health)) or Utils.Blank) for i in self.Players]),
             inline=False
         )
         display.set_footer(text=(self.Message.Embed.footer.text or Utils.Blank) if self.Message.Embed else Utils.Blank)
@@ -79,10 +82,12 @@ class Game:
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
         sleep(Settings.DialogueInterval)
 
+        if not target.Health:
+            return await self.EndGame(self.Players[not self.Players.index(target)])
         if not len(self.Info.Gun):
             return await self.StartRound()
 
-        self.Info.Turn = [i for i in self.Players if i!=self.Info.Turn][0]
+        self.Info.Turn = self.Players[not self.Players.index(self.Info.Turn)]
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
