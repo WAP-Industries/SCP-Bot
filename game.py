@@ -28,6 +28,7 @@ class Game:
         class B:
             Play = self.ButtonPlay
             Shoot = self.ButtonShoot
+            Item = self.ButtonItem
         self.Buttons = B
 
     @staticmethod
@@ -59,7 +60,10 @@ class Game:
             
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
-    async def EndGame(self, winner: Player):
+    async def EndGame(self, winner: Player, loser: Player):
+        from bot import BRBot
+        BRBot.UpdateStats(winner.User.id, True)
+        BRBot.UpdateStats(loser.User.id, False)
         await self.UpdateDialogue(f"{winner.Name} wins!")
 
     async def UpdateDialogue(self, text: str):
@@ -99,7 +103,7 @@ class Game:
         sleep(Settings.DialogueInterval)
 
         if not target.Health:
-            return await self.EndGame(self.Players[not self.Players.index(target)])
+            return await self.EndGame(self.Players[not self.Players.index(target)], target)
         if not len(self.Info.Gun):
             return await self.StartRound()
 
@@ -115,7 +119,7 @@ class Game:
 
     async def DrawItems(self, count: int):
         for i in self.Players:
-            for _ in range(count-len(i.Items)):
+            for _ in range(count-len([*filter(lambda x: x.Name, i.Items)])):
                 await self.AddItem(i, random.choice(Items))
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
@@ -123,6 +127,7 @@ class Game:
             return await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
         message = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
         await message.AddButton("Shoot", "🔫", self.Buttons.Shoot)
+        await message.AddButton("Item", "🔧", self.Buttons.Item)
 
     async def ButtonShoot(self, interaction: nextcord.Interaction):
         await interaction.response.defer()
@@ -147,3 +152,6 @@ class Game:
 
         await message.AddButton("Yourself", "🤓", c)
         await message.AddButton(enemy.User.name, "😈", e)
+
+    async def ButtonItem(self, interaction: nextcord.Interaction):
+        pass
