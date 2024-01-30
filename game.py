@@ -2,14 +2,7 @@ import random
 from time import sleep
 
 from settings import *
-from utils import *
 from items import *
-
-class Item:
-    def __init__(self, name: str=None, repr: str=None, callback: Utils.Function=None):
-        self.Name = name
-        self.Repr = repr or "⍰"
-        self.Callback = callback
 
 class Player:
     def __init__(self, user: nextcord.Member):
