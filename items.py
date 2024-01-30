@@ -6,6 +6,7 @@ class Item:
         self.Name = name
         self.Repr = emoji.emojize(f":{repr}:") if repr else "⍰"
         self.Callback = callback
+        self.Game = None
 
 
 Items = [

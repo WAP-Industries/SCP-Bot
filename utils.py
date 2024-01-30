@@ -3,7 +3,7 @@ from nextcord.ext import commands
 
 class Utils:
     Blank = chr(173)
-    Function = type(abs)
+    Function = type(lambda:0)
 
 class __Message__:
     def __init__(self, message: nextcord.Message):
@@ -14,8 +14,8 @@ class __Message__:
     async def Update(self):
         await self.Reference.edit(content=Utils.Blank, embed=self.Embed, view=self.View)
     
-    async def AddButton(self, text: str, emoji: str, callback: Utils.Function):
-        button = nextcord.ui.Button(style=nextcord.ButtonStyle.primary, label=text, emoji=emoji)
+    async def AddButton(self, text: str, emoji: str, callback: Utils.Function, cid: str=None):
+        button = nextcord.ui.Button(style=nextcord.ButtonStyle.primary, label=text, emoji=emoji, custom_id=cid)
         button.callback = callback
         self.View.add_item(button)
         await self.Update()

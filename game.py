@@ -1,5 +1,6 @@
 import random
 from time import sleep
+from copy import copy
 
 from settings import *
 from items import *
@@ -9,7 +10,7 @@ class Player:
         self.User = user
         self.Name = user.name
         self.Health = Settings.PlayerHealth
-        self.Items = [Item()]*8
+        self.Items = [Item()]*Settings.MaxItems
 
 class GameInfo:
     def __init__(self):
@@ -34,19 +35,28 @@ class Game:
         return f"`{text}...`"
 
     async def StartRound(self):
+        async def LoadGun():
+            self.Info.Gun = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
+            random.shuffle(self.Info.Gun)
+        
         self.Info.Round+=1
-        self.Info.Gun = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
-        random.shuffle(self.Info.Gun)
         self.Info.Turn = self.Player1
 
         await self.UpdateDisplay()
         for i in [
-            f"Round {self.Info.Round}",
-            f"{self.Info.Gun.count(1)} lives. {self.Info.Gun.count(0)} blanks.",
-            f"{self.Info.Turn.Name} starts!"
+            [f"Round {self.Info.Round}", None],
+            [
+                lambda: f"{len([*filter(lambda x: x.Name, self.Player1.Items)])} items drawn",
+                lambda: self.DrawItems(Settings.DrawConfig[self.Info.Round if self.Info.Round<len(Settings.DrawConfig) else -1])
+            ],
+            [lambda: f"{self.Info.Gun.count(1)} lives. {self.Info.Gun.count(0)} blanks.", LoadGun],
+            [f"{self.Info.Turn.Name} starts!", None]
         ]:
-            await self.UpdateDialogue(i)
+            if i[1]:
+                await i[1]()
+            await self.UpdateDialogue(i[0]() if type(i[0])==Utils.Function else i[0])
             sleep(Settings.DialogueInterval)
+            
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
     async def EndGame(self, winner: Player):
@@ -95,6 +105,18 @@ class Game:
 
         self.Info.Turn = self.Players[not self.Players.index(self.Info.Turn)]
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
+
+    async def AddItem(self, player: Player, item: Item):
+        item = copy(item)
+        item.Game = self
+        states = [*map(lambda x: not x.Name, player.Items)]
+        player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = item
+        await self.UpdateDisplay()
+
+    async def DrawItems(self, count: int):
+        for i in self.Players:
+            for _ in range(count-len(i.Items)):
+                await self.AddItem(i, random.choice(Items))
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
         if interaction.user!=self.Info.Turn.User:
