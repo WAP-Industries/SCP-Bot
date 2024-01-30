@@ -18,7 +18,7 @@ class BRBot:
     await ctx.send("bye nigger")
     await BRBot.Bot.close()
 
-  @Bot.command(help="Starts a new game of Buckshot Roulette")
+  @Bot.command(help="Starts a game of Buckshot Roulette")
   async def play(ctx: commands.Context, user: nextcord.Member):
     game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
     await game.StartRound()

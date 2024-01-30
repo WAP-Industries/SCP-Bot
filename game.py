@@ -3,13 +3,20 @@ from time import sleep
 
 from settings import *
 from utils import *
+from items import *
 
+class Item:
+    def __init__(self, name: str=None, repr: str=None, callback: Utils.Function=None):
+        self.Name = name
+        self.Repr = repr or "⍰"
+        self.Callback = callback
 
 class Player:
     def __init__(self, user: nextcord.Member):
         self.User = user
         self.Name = user.name
         self.Health = Settings.PlayerHealth
+        self.Items = [Item()]*8
 
 class GameInfo:
     def __init__(self):
@@ -67,7 +74,13 @@ class Game:
         AddBlank(display)
         display.add_field( 
             name="",
-            value = "\n\n".join(['**{}**\n{}'.format(i.Name, "".join("\u258D" for _ in range(i.Health)) or Utils.Blank) for i in self.Players]),
+            value = "\n\n\n".join([
+                '**{}**\n{}\n\n{}'.format(
+                    i.Name, 
+                    "".join(i.Items[j].Repr+["","\n"][j==len(i.Items)/2-1] for j in range(len(i.Items))), 
+                    "".join("\u258D" for _ in range(i.Health)) or Utils.Blank
+                ) for i in self.Players
+            ]),
             inline=False
         )
         display.set_footer(text=(self.Message.Embed.footer.text or Utils.Blank) if self.Message.Embed else Utils.Blank)
