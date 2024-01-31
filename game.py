@@ -8,7 +8,7 @@ class Player:
     def __init__(self, user: nextcord.Member):
         self.User = user
         self.Name = user.name
-        self.Health = Settings.MaxHealth
+        self.Health = Settings.PlayerHealth
         self.Items = [Item()]*Settings.MaxItems
 
 class GameInfo:
@@ -39,7 +39,10 @@ class Game:
     
     @staticmethod
     async def ClearInteraction(interaction: nextcord.Interaction):
-        await interaction.response.defer()
+        try:
+            await interaction.response.defer()
+        except:
+            pass
         await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
 
     async def StartRound(self):
@@ -128,8 +131,8 @@ class Game:
             for _ in range(count-len([*filter(lambda x: x.Name, i.Items)])):
                 await self.AddItem(i, random.choice(Items))
     
-    async def UseItem(self, item: Item, player: Player):
-        item.Callback(player)
+    async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player):
+        await item.Callback(player, self, interaction)
         for i in reversed(range(len(player.Items))):
             if player.Items[i].Name==item.Name:
                 player.Items[i] = Item()
@@ -172,7 +175,7 @@ class Game:
         message = Utils.Message(await interaction.original_message())
 
         async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player):
-            await self.UseItem(item, player)
+            await self.UseItem(interaction, item, player)
             await self.ButtonItem(interaction)
 
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2

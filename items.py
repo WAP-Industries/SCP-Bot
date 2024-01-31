@@ -8,30 +8,37 @@ class Item:
 
     class Callbacks:
         @staticmethod
-        def Beer(player):
+        async def Beer(player, game, interaction):
             pass
 
         @staticmethod
-        def Saw(player):
+        async def Saw(player, game, interaction):
             pass
 
         @staticmethod
-        def Cigarette(player):
+        async def Cigarette(player, game, interaction):
             player.Health+=1
 
         @staticmethod
-        def MagnifyingGlass(player):
-            pass
+        async def MagnifyingGlass(player, game, interaction):
+            from bot import BRBot
+            embed = BRBot.CreateEmbed("")
+            embed.add_field(
+                name="", 
+                value=f'🔫\n{"".join("❓" for _ in range(len(game.Info.Gun.Chamber)-1))+"🔵🔴"[game.Info.Gun.Chamber[-1]]}'
+            )
+            await interaction.response.defer()
+            await interaction.followup.send(Utils.Blank, ephemeral=True, embed=embed)
 
         @staticmethod
-        def Handcuffs(player):
+        async def Handcuffs(player, game, interaction):
             pass
 
 
 Items = [
-    # Item("Beer", "🍺", Item.Callbacks.Beer),
-    # Item("Hand Saw", "🪚", Item.Callbacks.Saw),
+    Item("Beer", "🍺", Item.Callbacks.Beer),
+    Item("Hand Saw", "🪚", Item.Callbacks.Saw),
     Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
-    # Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
-    # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
+    Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
+    Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
 ]
