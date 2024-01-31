@@ -1,6 +1,5 @@
 import random
 from time import sleep
-from copy import copy
 
 from settings import *
 from items import *
@@ -121,7 +120,7 @@ class Game:
 
     async def AddItem(self, player: Player, item: Item):
         states = [*map(lambda x: not x.Name, player.Items)]
-        player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = copy(item)
+        player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = item
         await self.UpdateDisplay()
 
     async def DrawItems(self, count: int):
@@ -136,6 +135,7 @@ class Game:
                 player.Items[i] = Item()
                 break
         await self.UpdateDisplay()
+        await self.UpdateDialogue(f"{player.Name} used {item.Name}!")
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
         if interaction.user!=self.Info.Turn.User:
@@ -171,6 +171,10 @@ class Game:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 
+        async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player):
+            await self.UseItem(item, player)
+            await self.ButtonItem(interaction)
+
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2
-        for i in [i for i in Items if i.Name and [*filter(lambda x: x.Name, player.Items)]]:
-            await message.AddButton(i.Name, i.Repr, lambda _: self.UseItem(i, player))
+        for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name, player.Items)]]:
+            await message.AddButton(item.Name, item.Repr, lambda i: InvokeItem(i, item, player))
