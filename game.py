@@ -9,14 +9,17 @@ class Player:
     def __init__(self, user: nextcord.Member):
         self.User = user
         self.Name = user.name
-        self.Health = Settings.PlayerHealth
+        self.Health = Settings.MaxHealth
         self.Items = [Item()]*Settings.MaxItems
 
 class GameInfo:
     def __init__(self):
         self.Round = 0
         self.Turn = None
-        self.Gun = []
+        class G:
+            Chamber = []
+            Damage = 1
+        self.Gun = G
 
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
@@ -34,11 +37,17 @@ class Game:
     @staticmethod
     def DebugMessage(text):
         return f"`{text}...`"
+    
+    @staticmethod
+    async def ClearInteraction(interaction: nextcord.Interaction):
+        await interaction.response.defer()
+        await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
 
     async def StartRound(self):
         async def LoadGun():
-            self.Info.Gun = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
-            random.shuffle(self.Info.Gun)
+            self.Info.Gun.Chamber = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
+            random.shuffle(self.Info.Gun.Chamber)
+            await self.UpdateDisplay()
         
         self.Info.Round+=1
         self.Info.Turn = self.Player1
@@ -50,7 +59,7 @@ class Game:
                 lambda: f"{len([*filter(lambda x: x.Name, self.Player1.Items)])} items drawn",
                 lambda: self.DrawItems(Settings.DrawConfig[self.Info.Round if self.Info.Round<len(Settings.DrawConfig) else -1])
             ],
-            [lambda: f"{self.Info.Gun.count(1)} lives. {self.Info.Gun.count(0)} blanks.", LoadGun],
+            [lambda: f"{self.Info.Gun.Chamber.count(1)} lives. {self.Info.Gun.Chamber.count(0)} blanks.", LoadGun],
             [f"{self.Info.Turn.Name} starts!", None]
         ]:
             if i[1]:
@@ -77,7 +86,7 @@ class Game:
         display = BRBot.CreateEmbed("")
         display.add_field(name=f"**{self.Player1.Name} vs {self.Player2.Name}**", value="")
         AddBlank(display)
-        display.add_field(name="", value=f'🔫\n{"".join("❓" for _ in self.Info.Gun) or Utils.Blank}', inline=False)
+        display.add_field(name="", value=f'🔫\n{"".join("❓" for _ in self.Info.Gun.Chamber) or Utils.Blank}', inline=False)
         AddBlank(display)
         display.add_field( 
             name="",
@@ -96,7 +105,7 @@ class Game:
         await self.Message.Reference.edit(content="", embed=display)
 
     async def Shoot(self, target: Player):
-        bullet = self.Info.Gun.pop()
+        bullet = self.Info.Gun.Chamber.pop()
         target.Health-=1*bullet
         await self.UpdateDisplay()
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
@@ -104,23 +113,29 @@ class Game:
 
         if not target.Health:
             return await self.EndGame(self.Players[not self.Players.index(target)], target)
-        if not len(self.Info.Gun):
+        if not len(self.Info.Gun.Chamber):
             return await self.StartRound()
 
         self.Info.Turn = self.Players[not self.Players.index(self.Info.Turn)]
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
 
     async def AddItem(self, player: Player, item: Item):
-        item = copy(item)
-        item.Game = self
         states = [*map(lambda x: not x.Name, player.Items)]
-        player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = item
+        player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = copy(item)
         await self.UpdateDisplay()
 
     async def DrawItems(self, count: int):
         for i in self.Players:
             for _ in range(count-len([*filter(lambda x: x.Name, i.Items)])):
                 await self.AddItem(i, random.choice(Items))
+    
+    async def UseItem(self, item: Item, player: Player):
+        item.Callback(player)
+        for i in reversed(range(len(player.Items))):
+            if player.Items[i].Name==item.Name:
+                player.Items[i] = Item()
+                break
+        await self.UpdateDisplay()
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
         if interaction.user!=self.Info.Turn.User:
@@ -130,9 +145,8 @@ class Game:
         await message.AddButton("Item", "🔧", self.Buttons.Item)
 
     async def ButtonShoot(self, interaction: nextcord.Interaction):
-        await interaction.response.defer()
+        await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
-        await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
 
         current = self.Player1 if self.Player1.User==interaction.user else self.Player2
         enemy = self.Player2 if current==self.Player1 else self.Player2
@@ -154,4 +168,9 @@ class Game:
         await message.AddButton(enemy.User.name, "😈", e)
 
     async def ButtonItem(self, interaction: nextcord.Interaction):
-        pass
+        await Game.ClearInteraction(interaction)
+        message = Utils.Message(await interaction.original_message())
+
+        player = self.Player1 if interaction.user==self.Player1.User else self.Player2
+        for i in [i for i in Items if i.Name and [*filter(lambda x: x.Name, player.Items)]]:
+            await message.AddButton(i.Name, i.Repr, lambda _: self.UseItem(i, player))

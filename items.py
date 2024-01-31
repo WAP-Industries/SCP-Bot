@@ -1,15 +1,37 @@
 from utils import *
-import emoji
 
 class Item:
     def __init__(self, name: str=None, repr: str=None, callback: Utils.Function=None):
         self.Name = name
-        self.Repr = emoji.emojize(f":{repr}:") if repr else "⍰"
+        self.Repr = repr or "⍰"
         self.Callback = callback
-        self.Game = None
+
+    class Callbacks:
+        @staticmethod
+        def Beer(player):
+            pass
+
+        @staticmethod
+        def Saw(player):
+            pass
+
+        @staticmethod
+        def Cigarette(player):
+            player.Health+=1
+
+        @staticmethod
+        def MagnifyingGlass(player):
+            pass
+
+        @staticmethod
+        def Handcuffs(player):
+            pass
 
 
 Items = [
-    Item("Beer", "beer", lambda: 0),
-    Item("Saw", "carpentry_saw", lambda: 0)
+    # Item("Beer", "🍺", Item.Callbacks.Beer),
+    # Item("Hand Saw", "🪚", Item.Callbacks.Saw),
+    Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
+    # Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
+    # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
 ]

@@ -12,7 +12,7 @@ class Settings:
         [1]*3+[0]*4,
         [1]*4+[0]*5,
     ]
-    DrawConfig = [2, 4]
+    DrawConfig = [None, 2, 4]
 
-    PlayerHealth = 5
+    MaxHealth = 5
     MaxItems = 8
