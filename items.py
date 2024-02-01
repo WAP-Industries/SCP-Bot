@@ -13,7 +13,8 @@ class Item:
 
         @staticmethod
         async def Saw(player, game, interaction):
-            game.Info.Gun.Damage = 2
+            game.Info.Gun.Damage*=2
+            game.Info.Gun.Multi+=1
             await game.UpdateDialogue("Shotgun damage doubled!")
 
         @staticmethod
@@ -39,9 +40,9 @@ class Item:
 
 
 Items = [
-    Item("Beer", "🍺", Item.Callbacks.Beer),
+    # Item("Beer", "🍺", Item.Callbacks.Beer),
     Item("Hand Saw", "🪚", Item.Callbacks.Saw),
-    Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
-    Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
-    Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
+    # Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
+    # Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
+    # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
 ]

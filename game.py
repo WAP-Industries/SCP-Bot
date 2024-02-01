@@ -18,6 +18,7 @@ class GameInfo:
         class G:
             Chamber = []
             Damage = 1
+            Multi = 0
         self.Gun = G
 
 class Game:
@@ -88,7 +89,11 @@ class Game:
         display = BRBot.CreateEmbed("")
         display.add_field(name=f"**{self.Player1.Name} vs {self.Player2.Name}**", value="")
         AddBlank(display)
-        display.add_field(name="", value=f'🔫{" ☠"*(self.Info.Gun.Damage>1)}\n{"".join("❓" for _ in self.Info.Gun.Chamber) or Utils.Blank}', inline=False)
+        display.add_field(
+            name="", 
+            value='🔫{}\n{}'.format("\u3000"+"".join(["☠" for _ in range(self.Info.Gun.Multi)]), "".join("❓" for _ in self.Info.Gun.Chamber) or Utils.Blank), 
+            inline=False
+        )
         AddBlank(display)
         display.add_field( 
             name="",
@@ -113,11 +118,12 @@ class Game:
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
         if bullet and self.Info.Gun.Damage>1:
             await sleep(Settings.DialogueInterval)
-            await self.UpdateDialogue(f"Sawed-off shotgun deals double damage!")
+            await self.UpdateDialogue(f"Sawed-off shotgun deals {self.Info.Gun.Damage} damage!")
             self.Info.Gun.Damage = 1
+            self.Info.Gun.Multi = 0
         await sleep(Settings.DialogueInterval)
 
-        if not target.Health:
+        if target.Health<=0:
             return await self.EndGame(self.Players[not self.Players.index(target)], target)
         if not len(self.Info.Gun.Chamber):
             return await self.StartRound()
