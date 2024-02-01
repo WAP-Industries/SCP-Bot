@@ -4,7 +4,7 @@ class Settings:
         LoadOptions = "Loading options"
         NotTurn = "Wait for your turn, nigger."
 
-    DialogueInterval = 2
+    DialogueInterval = 1
     
     RoundConfig = [
         None,

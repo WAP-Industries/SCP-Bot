@@ -1,5 +1,5 @@
 import random
-from time import sleep
+from asyncio import sleep
 
 from settings import *
 from items import *
@@ -67,7 +67,7 @@ class Game:
             if i[1]:
                 await i[1]()
             await self.UpdateDialogue(i[0]() if type(i[0])==Utils.Function else i[0])
-            sleep(Settings.DialogueInterval)
+            await sleep(Settings.DialogueInterval)
             
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
@@ -88,14 +88,14 @@ class Game:
         display = BRBot.CreateEmbed("")
         display.add_field(name=f"**{self.Player1.Name} vs {self.Player2.Name}**", value="")
         AddBlank(display)
-        display.add_field(name="", value=f'🔫\n{"".join("❓" for _ in self.Info.Gun.Chamber) or Utils.Blank}', inline=False)
+        display.add_field(name="", value=f'🔫{" ☠"*(self.Info.Gun.Damage>1)}\n{"".join("❓" for _ in self.Info.Gun.Chamber) or Utils.Blank}', inline=False)
         AddBlank(display)
         display.add_field( 
             name="",
             value = "\n\n\n".join([
                 '**{}**\n{}\n\n{}'.format(
                     i.Name, 
-                    "".join(i.Items[j].Repr+["","\n"][j==len(i.Items)/2-1] for j in range(len(i.Items))), 
+                    "".join(i.Items[j].Repr+"\n"*(j==len(i.Items)/2-1) for j in range(len(i.Items))), 
                     "".join("\u258D" for _ in range(i.Health)) or Utils.Blank
                 ) for i in self.Players
             ]),
@@ -112,10 +112,10 @@ class Game:
         await self.UpdateDisplay()
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
         if bullet and self.Info.Gun.Damage>1:
-            sleep(Settings.DialogueInterval)
+            await sleep(Settings.DialogueInterval)
             await self.UpdateDialogue(f"Sawed-off shotgun deals double damage!")
             self.Info.Gun.Damage = 1
-        sleep(Settings.DialogueInterval)
+        await sleep(Settings.DialogueInterval)
 
         if not target.Health:
             return await self.EndGame(self.Players[not self.Players.index(target)], target)
@@ -138,6 +138,7 @@ class Game:
     
     async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player):
         await self.UpdateDialogue(f"{player.Name} uses {item.Name}!")
+        await sleep(Settings.DialogueInterval)
         await item.Callback(player, self, interaction)
         for i in reversed(range(len(player.Items))):
             if player.Items[i].Name==item.Name:
