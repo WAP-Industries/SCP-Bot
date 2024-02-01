@@ -58,7 +58,7 @@ class Game:
         for i in [
             [f"Round {self.Info.Round}", None],
             [
-                lambda: f"{len([*filter(lambda x: x.Name, self.Player1.Items)])} items drawn",
+                lambda: f"{Settings.DrawConfig[self.Info.Round]} items drawn",
                 lambda: self.DrawItems(Settings.DrawConfig[self.Info.Round if self.Info.Round<len(Settings.DrawConfig) else -1])
             ],
             [lambda: f"{self.Info.Gun.Chamber.count(1)} lives. {self.Info.Gun.Chamber.count(0)} blanks.", LoadGun],
@@ -108,9 +108,13 @@ class Game:
 
     async def Shoot(self, target: Player):
         bullet = self.Info.Gun.Chamber.pop()
-        target.Health-=1*bullet
+        target.Health-=self.Info.Gun.Damage*bullet
         await self.UpdateDisplay()
         await self.UpdateDialogue(f'{self.Info.Turn.Name} shot {"themself" if self.Info.Turn==target else target.Name} with a {["blank", "live"][bullet]} round!')
+        if bullet and self.Info.Gun.Damage>1:
+            sleep(Settings.DialogueInterval)
+            await self.UpdateDialogue(f"Sawed-off shotgun deals double damage!")
+            self.Info.Gun.Damage = 1
         sleep(Settings.DialogueInterval)
 
         if not target.Health:
@@ -128,17 +132,18 @@ class Game:
 
     async def DrawItems(self, count: int):
         for i in self.Players:
-            for _ in range(count-len([*filter(lambda x: x.Name, i.Items)])):
+            curr = len([*filter(lambda x: x.Name, i.Items)])
+            for _ in range(count if curr+count<=Settings.MaxItems else Settings.MaxItems-curr):
                 await self.AddItem(i, random.choice(Items))
     
     async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player):
+        await self.UpdateDialogue(f"{player.Name} uses {item.Name}!")
         await item.Callback(player, self, interaction)
         for i in reversed(range(len(player.Items))):
             if player.Items[i].Name==item.Name:
                 player.Items[i] = Item()
                 break
         await self.UpdateDisplay()
-        await self.UpdateDialogue(f"{player.Name} used {item.Name}!")
 
     async def ButtonPlay(self, interaction: nextcord.Interaction):
         if interaction.user!=self.Info.Turn.User:
@@ -179,5 +184,5 @@ class Game:
             await self.ButtonItem(interaction)
 
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2
-        for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name, player.Items)]]:
+        for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name==i.Name, player.Items)]]:
             await message.AddButton(item.Name, item.Repr, lambda i: InvokeItem(i, item, player))

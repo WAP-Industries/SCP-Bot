@@ -13,11 +13,13 @@ class Item:
 
         @staticmethod
         async def Saw(player, game, interaction):
-            pass
+            game.Info.Gun.Damage = 2
+            # await game.UpdateDialogue("Shotgun damage doubled!")
 
         @staticmethod
         async def Cigarette(player, game, interaction):
             player.Health+=1
+            # await game.UpdateDialogue(f"{player.Name} regains 1 Health!")
 
         @staticmethod
         async def MagnifyingGlass(player, game, interaction):
@@ -27,8 +29,9 @@ class Item:
                 name="", 
                 value=f'🔫\n{"".join("❓" for _ in range(len(game.Info.Gun.Chamber)-1))+"🔵🔴"[game.Info.Gun.Chamber[-1]]}'
             )
+            # await game.UpdateDialogue(f"{player.Name} inspects the chamber...")
             await interaction.response.defer()
-            await interaction.followup.send(Utils.Blank, ephemeral=True, embed=embed)
+            await interaction.followup.send(Utils.Blank, embed=embed, ephemeral=True)
 
         @staticmethod
         async def Handcuffs(player, game, interaction):
@@ -36,9 +39,9 @@ class Item:
 
 
 Items = [
-    Item("Beer", "🍺", Item.Callbacks.Beer),
-    Item("Hand Saw", "🪚", Item.Callbacks.Saw),
-    Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
+    # Item("Beer", "🍺", Item.Callbacks.Beer),
+    # Item("Hand Saw", "🪚", Item.Callbacks.Saw),
+    # Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
     Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
-    Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
+    # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
 ]
