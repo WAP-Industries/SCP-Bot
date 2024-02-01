@@ -1,5 +1,4 @@
 from utils import *
-from settings import *
 
 class Item:
     def __init__(self, name: str=None, repr: str=None, callback: Utils.Function=None):
