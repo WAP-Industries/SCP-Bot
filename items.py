@@ -36,7 +36,7 @@ class Item:
 
         @staticmethod
         async def Handcuffs(player, game, interaction):
-            pass
+            await game.UppdateDialogue(f"{game.Players[not game.Players.index(player)].Name} turn skipped!")
 
 
 Items = [

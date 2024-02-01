@@ -21,7 +21,7 @@ class BRBot:
          BRBot.Stats = json.loads(f.read())
 
   @staticmethod
-  def UpdateStats(pid: int, win: bool):
+  def UpdateStats(pid: str, win: bool):
     if pid not in BRBot.Stats:
       BRBot.Stats[pid] = {
          "Win": 0,
@@ -42,6 +42,9 @@ class BRBot:
 
   @Bot.command(help="Starts a game of Buckshot Roulette")
   async def play(ctx: commands.Context, user: nextcord.Member):
+    if user==ctx.author:
+      return await ctx.reply(Settings.Messages.SelfChallenge)
+
     game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
     await game.StartRound()
 

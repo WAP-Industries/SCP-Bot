@@ -3,6 +3,7 @@ class Settings:
         NewGame = "Creating game"
         LoadOptions = "Loading options"
         NotTurn = "Wait for your turn, nigger."
+        SelfChallenge = "You can't play against yourself, nigger"
 
     DialogueInterval = 1
     
@@ -14,5 +15,5 @@ class Settings:
     ]
     DrawConfig = [None, 2, 4]
 
-    PlayerHealth = 6
+    PlayerHealth = 1#6
     MaxItems = 8

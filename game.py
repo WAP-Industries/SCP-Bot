@@ -11,22 +11,20 @@ class Player:
         self.Health = Settings.PlayerHealth
         self.Items = [Item()]*Settings.MaxItems
 
-class GameInfo:
-    def __init__(self):
-        self.Round = 0
-        self.Turn = None
-        class G:
-            Chamber = []
-            Damage = 1
-            Multi = 0
-        self.Gun = G
-
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
         self.Player1, self.Player2 = Player(player1), Player(player2)
         self.Players = [self.Player1, self.Player2]
-        self.Info = GameInfo()
         self.Message = Utils.Message(message)
+        
+        class I:
+            Round = 0
+            Turn = None
+            class Gun:
+                Chamber = []
+                Damage = 1
+                Multi = 0
+        self.Info = I
         
         class B:
             Play = self.ButtonPlay
@@ -74,8 +72,8 @@ class Game:
 
     async def EndGame(self, winner: Player, loser: Player):
         from bot import BRBot
-        BRBot.UpdateStats(winner.User.id, True)
-        BRBot.UpdateStats(loser.User.id, False)
+        BRBot.UpdateStats(str(winner.User.id), True)
+        BRBot.UpdateStats(str(loser.User.id), False)
         await self.UpdateDialogue(f"{winner.Name} wins!")
 
     async def UpdateDialogue(self, text: str):
