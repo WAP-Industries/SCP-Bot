@@ -40,8 +40,8 @@ class Item:
 
 
 Items = [
-    # Item("Beer", "🍺", Item.Callbacks.Beer),
-    Item("Hand Saw", "🪚", Item.Callbacks.Saw),
+    Item("Beer", "🍺", Item.Callbacks.Beer),
+    # Item("Hand Saw", "🪚", Item.Callbacks.Saw),
     # Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
     # Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
     # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)

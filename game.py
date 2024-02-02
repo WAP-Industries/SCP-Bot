@@ -37,12 +37,12 @@ class Game:
         return f"`{text}...`"
     
     @staticmethod
-    async def ClearInteraction(interaction: nextcord.Interaction):
+    async def ClearInteraction(interaction: nextcord.Interaction, empty: bool=False):
         try:
             await interaction.response.defer()
         except:
             pass
-        await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
+        await interaction.edit_original_message(content=Utils.Blank if empty else Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
 
     async def StartRound(self):
         async def LoadGun():
@@ -170,11 +170,11 @@ class Game:
 
         async def c(_):
             await ClearButton()
-            await interaction.edit_original_message(content=Utils.Blank, view=None)
+            await Game.ClearInteraction(interaction, True)
             await self.Shoot(current)
         async def e(_):
             await ClearButton()
-            await interaction.edit_original_message(content=Utils.Blank, view=None)
+            await Game.ClearInteraction(interaction, True)
             await self.Shoot(enemy)
 
         await message.AddButton("Yourself", "🤓", c)
@@ -187,6 +187,10 @@ class Game:
         async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player):
             await self.UseItem(interaction, item, player)
             await self.ButtonItem(interaction)
+            if not len(self.Info.Gun.Chamber):
+                await Game.ClearInteraction(interaction, True)
+                await sleep(Settings.DialogueInterval)
+                await self.StartRound()
 
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2
         for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name==i.Name, player.Items)]]:

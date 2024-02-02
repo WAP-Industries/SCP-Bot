@@ -15,5 +15,5 @@ class Settings:
     ]
     DrawConfig = [None, 2, 4]
 
-    PlayerHealth = 1#6
+    PlayerHealth = 6
     MaxItems = 8
