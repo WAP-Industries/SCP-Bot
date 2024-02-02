@@ -10,6 +10,7 @@ class Player:
         self.Name = user.name
         self.Health = Settings.PlayerHealth
         self.Items = [Item()]*Settings.MaxItems
+        self.Handcuffed = False
 
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
@@ -97,7 +98,7 @@ class Game:
             name="",
             value = "\n\n\n".join([
                 '**{}**\n{}\n\n{}'.format(
-                    i.Name, 
+                    i.Name+f"🔗"*i.Handcuffed, 
                     "".join(i.Items[j].Repr+"\n"*(j==len(i.Items)/2-1) for j in range(len(i.Items))), 
                     "".join("\u258D" for _ in range(i.Health)) or Utils.Blank
                 ) for i in self.Players
@@ -126,8 +127,17 @@ class Game:
         if not len(self.Info.Gun.Chamber):
             return await self.StartRound()
 
-        self.Info.Turn = self.Players[not self.Players.index(self.Info.Turn)]
+        other = self.Players[not self.Players.index(self.Info.Turn)]
+        if not other.Handcuffed:
+            self.Info.Turn = other
+        else:
+            await sleep(Settings.DialogueInterval)
+            await self.UpdateDialogue(f"Handcuffs skip {other.Name}'s turn!")
+            other.Handcuffed = False
+            await self.UpdateDisplay()
+            await sleep(Settings.DialogueInterval)
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
+        await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
     async def AddItem(self, player: Player, item: Item):
         states = [*map(lambda x: not x.Name, player.Items)]

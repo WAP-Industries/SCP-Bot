@@ -36,13 +36,15 @@ class Item:
 
         @staticmethod
         async def Handcuffs(player, game, interaction):
-            await game.UppdateDialogue(f"{game.Players[not game.Players.index(player)].Name} turn skipped!")
+            target = game.Players[not game.Players.index(player)]
+            target.Handcuffed = True
+            await game.UpdateDialogue(f"{player.Name} handcuffs {target.Name} to the table!")
 
 
 Items = [
     Item("Beer", "🍺", Item.Callbacks.Beer),
-    # Item("Hand Saw", "🪚", Item.Callbacks.Saw),
-    # Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
-    # Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
-    # Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
+    Item("Hand Saw", "🪚", Item.Callbacks.Saw),
+    Item("Cigarette", "🚬", Item.Callbacks.Cigarette),
+    Item("Magnifying Glass", "🔍", Item.Callbacks.MagnifyingGlass),
+    Item("Handcuffs", "🔗", Item.Callbacks.Handcuffs)
 ]
