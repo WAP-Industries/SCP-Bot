@@ -4,6 +4,7 @@ class Settings:
         LoadOptions = "Loading options"
         NotTurn = "Wait for your turn, nigger."
         SelfChallenge = "You can't play against yourself, nigger"
+        NoUser = lambda x: f"There isn't any member named {x}, nigger"
 
     DialogueInterval = 1
     

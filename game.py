@@ -128,14 +128,15 @@ class Game:
             return await self.StartRound()
 
         other = self.Players[not self.Players.index(self.Info.Turn)]
-        if not other.Handcuffed:
-            self.Info.Turn = other
-        else:
-            await sleep(Settings.DialogueInterval)
-            await self.UpdateDialogue(f"Handcuffs skip {other.Name}'s turn!")
-            other.Handcuffed = False
-            await self.UpdateDisplay()
-            await sleep(Settings.DialogueInterval)
+        if not (not bullet and target==self.Info.Turn):
+            if not other.Handcuffed:
+                self.Info.Turn = other
+            else:
+                await sleep(Settings.DialogueInterval)
+                await self.UpdateDialogue(f"Handcuffs skip {other.Name}'s turn!")
+                other.Handcuffed = False
+                await self.UpdateDisplay()
+                await sleep(Settings.DialogueInterval)
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 

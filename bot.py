@@ -9,6 +9,15 @@ class BRBot:
   Stats, StatsFile = {}, "stats.json"
 
   @staticmethod
+  def CheckUser(func):
+    async def wrapper(ctx, user: nextcord.Member):
+      if isinstance(user, nextcord.Member) and user.guild==ctx.guild:
+        return await func(ctx, user)
+      else:
+        await ctx.reply(Settings.Messages.NoUser(user))
+    return wrapper
+
+  @staticmethod
   def CreateEmbed(title: str):
         return nextcord.Embed(title=title, color=nextcord.Color(0x2c2c34))
   
