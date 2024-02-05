@@ -76,6 +76,7 @@ class Game:
         BRBot.UpdateStats(str(winner.User.id), True)
         BRBot.UpdateStats(str(loser.User.id), False)
         await self.UpdateDialogue(f"{winner.Name} wins!")
+        BRBot.Games.remove(self)
 
     async def UpdateDialogue(self, text: str):
         self.Message.Embed.set_footer(text=text)

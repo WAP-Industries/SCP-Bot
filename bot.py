@@ -9,8 +9,12 @@ class BRBot:
     Stats, StatsFile = {}, "stats.json"
 
     @staticmethod
+    def PlayerInGame(player: nextcord.Member):
+        return bool(len([*filter(lambda x: player in map(lambda y: y.User, x.Players), BRBot.Games)]))
+
+    @staticmethod
     def CheckUser(func):
-        async def wrapper(ctx: commands.Context, user):
+        async def wrapper(ctx: commands.Context, user: str):
             try:
                 return await func(ctx, await commands.MemberConverter().convert(ctx, user))
             except:
@@ -64,8 +68,15 @@ class BRBot:
     async def play(ctx: commands.Context, user: nextcord.Member):
         if user==ctx.author:
             return await ctx.reply(Settings.Messages.SelfChallenge)
+        
+        if BRBot.PlayerInGame(ctx.author):
+            return await ctx.reply(Settings.Messages.AlreadyInGame("You're"))
+        
+        if BRBot.PlayerInGame(user):
+            return await ctx.reply(Settings.Messages.AlreadyInGame(f"{user.name} is"))
 
         game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
+        BRBot.Games.append(game)
         await game.StartRound()
 
     @Bot.command(name="stats", help="Display player statistics")
