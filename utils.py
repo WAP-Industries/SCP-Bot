@@ -11,16 +11,16 @@ class __Message__:
         self.Embed = None
         self.View = nextcord.ui.View()
 
-    async def Update(self):
+    async def Update(self) -> None:
         await self.Reference.edit(content=Utils.Blank, embed=self.Embed, view=self.View)
     
-    async def AddButton(self, text: str, emoji: str, callback: Utils.Function, cid: str=None):
+    async def AddButton(self, text: str, emoji: str, callback: Utils.Function, cid: str=None) -> None:
         button = nextcord.ui.Button(style=nextcord.ButtonStyle.primary, label=text, emoji=emoji, custom_id=cid)
         button.callback = callback
         self.View.add_item(button)
         await self.Update()
 
-    async def ClearButtons(self):
+    async def ClearButtons(self) -> None:
         self.View.clear_items()
         await self.Update()
 

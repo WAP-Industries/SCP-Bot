@@ -8,22 +8,22 @@ class Item:
 
     class Callbacks:
         @staticmethod
-        async def Beer(player, game, interaction):
+        async def Beer(player, game, interaction) -> None:
             await game.UpdateDialogue(f'A {["blank", "live"][game.Info.Gun.Chamber.pop()]} round pops out of the shotgun.')
 
         @staticmethod
-        async def Saw(player, game, interaction):
+        async def Saw(player, game, interaction) -> None:
             game.Info.Gun.Damage*=2
             game.Info.Gun.Multi+=1
             await game.UpdateDialogue("Shotgun damage doubled!")
 
         @staticmethod
-        async def Cigarette(player, game, interaction):
+        async def Cigarette(player, game, interaction) -> None:
             player.Health+=1
             await game.UpdateDialogue(f"{player.Name} regains 1 Health!")
 
         @staticmethod
-        async def MagnifyingGlass(player, game, interaction):
+        async def MagnifyingGlass(player, game, interaction) -> None:
             from bot import BRBot
             embed = BRBot.CreateEmbed("")
             embed.add_field(
@@ -35,7 +35,7 @@ class Item:
             await interaction.followup.send(Utils.Blank, embed=embed, ephemeral=True)
 
         @staticmethod
-        async def Handcuffs(player, game, interaction):
+        async def Handcuffs(player, game, interaction) -> None:
             target = game.Players[not game.Players.index(player)]
             target.Handcuffed = True
             await game.UpdateDialogue(f"{player.Name} handcuffs {target.Name} to the table!")

@@ -34,19 +34,19 @@ class Game:
         self.Buttons = B
 
     @staticmethod
-    def DebugMessage(text):
+    def DebugMessage(text) -> str:
         return f"`{text}...`"
     
     @staticmethod
-    async def ClearInteraction(interaction: nextcord.Interaction, empty: bool=False):
+    async def ClearInteraction(interaction: nextcord.Interaction, empty: bool=False) -> None:
         try:
             await interaction.response.defer()
         except:
             pass
         await interaction.edit_original_message(content=Utils.Blank if empty else Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
 
-    async def StartRound(self):
-        async def LoadGun():
+    async def StartRound(self) -> None:
+        async def LoadGun() -> None:
             self.Info.Gun.Chamber = [*Settings.RoundConfig[self.Info.Round if self.Info.Round<len(Settings.RoundConfig) else -1]]
             random.shuffle(self.Info.Gun.Chamber)
             await self.UpdateDisplay()
@@ -71,18 +71,18 @@ class Game:
             
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
-    async def EndGame(self, winner: Player, loser: Player):
+    async def EndGame(self, winner: Player, loser: Player) -> None:
         from bot import BRBot
         BRBot.UpdateStats(str(winner.User.id), True)
         BRBot.UpdateStats(str(loser.User.id), False)
         await self.UpdateDialogue(f"{winner.Name} wins!")
         BRBot.Games.remove(self)
 
-    async def UpdateDialogue(self, text: str):
+    async def UpdateDialogue(self, text: str) -> None:
         self.Message.Embed.set_footer(text=text)
         await self.Message.Reference.edit(content="", embed=self.Message.Embed)
 
-    async def UpdateDisplay(self):
+    async def UpdateDisplay(self) -> None:
         from bot import BRBot
         AddBlank = lambda d: d.add_field(name="", value="", inline=False) 
 
@@ -111,7 +111,7 @@ class Game:
         self.Message.Embed = display
         await self.Message.Reference.edit(content="", embed=display)
 
-    async def Shoot(self, target: Player):
+    async def Shoot(self, target: Player) -> None:
         bullet = self.Info.Gun.Chamber.pop()
         target.Health-=self.Info.Gun.Damage*bullet
         await self.UpdateDisplay()
@@ -141,18 +141,18 @@ class Game:
         await self.UpdateDialogue(f"{self.Info.Turn.Name}'s turn!")
         await self.Message.AddButton("Play", "⏯", self.Buttons.Play)
 
-    async def AddItem(self, player: Player, item: Item):
+    async def AddItem(self, player: Player, item: Item) -> None:
         states = [*map(lambda x: not x.Name, player.Items)]
         player.Items[len(states)-states[::-1].index(False) if states.count(False) else 0] = item
         await self.UpdateDisplay()
 
-    async def DrawItems(self, count: int):
+    async def DrawItems(self, count: int) -> None:
         for i in self.Players:
             curr = len([*filter(lambda x: x.Name, i.Items)])
             for _ in range(count if curr+count<=Settings.MaxItems else Settings.MaxItems-curr):
                 await self.AddItem(i, random.choice(Items))
     
-    async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player):
+    async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player) -> None:
         await self.UpdateDialogue(f"{player.Name} uses {item.Name}!")
         await sleep(Settings.DialogueInterval)
         await item.Callback(player, self, interaction)
@@ -162,14 +162,14 @@ class Game:
                 break
         await self.UpdateDisplay()
 
-    async def ButtonPlay(self, interaction: nextcord.Interaction):
+    async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
         if interaction.user!=self.Info.Turn.User:
             return await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
         message = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
         await message.AddButton("Shoot", "🔫", self.Buttons.Shoot)
         await message.AddButton("Item", "🔧", self.Buttons.Item)
 
-    async def ButtonShoot(self, interaction: nextcord.Interaction):
+    async def ButtonShoot(self, interaction: nextcord.Interaction) -> None:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 
@@ -192,7 +192,7 @@ class Game:
         await message.AddButton("Yourself", "🤓", c)
         await message.AddButton(enemy.User.name, "😈", e)
 
-    async def ButtonItem(self, interaction: nextcord.Interaction):
+    async def ButtonItem(self, interaction: nextcord.Interaction) -> None:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 

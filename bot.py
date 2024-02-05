@@ -9,12 +9,12 @@ class BRBot:
     Stats, StatsFile = {}, "stats.json"
 
     @staticmethod
-    def PlayerInGame(player: nextcord.Member):
+    def PlayerInGame(player: nextcord.Member) -> bool:
         return bool(len([*filter(lambda x: player in map(lambda y: y.User, x.Players), BRBot.Games)]))
 
     @staticmethod
-    def CheckUser(func):
-        async def wrapper(ctx: commands.Context, user: str):
+    def CheckUser(func) -> Utils.Function:
+        async def wrapper(ctx: commands.Context, user: str) -> None:
             try:
                 return await func(ctx, await commands.MemberConverter().convert(ctx, user))
             except:
@@ -22,11 +22,11 @@ class BRBot:
         return wrapper
 
     @staticmethod
-    def CreateEmbed(title: str):
+    def CreateEmbed(title: str) -> nextcord.Embed:
         return nextcord.Embed(title=title, color=nextcord.Color(0x2c2c34))
     
     @staticmethod
-    def LoadStats():
+    def LoadStats() -> None:
         if not os.path.exists(BRBot.StatsFile):
             with open(BRBot.StatsFile, "w") as f:
                 f.write(json.dumps({}))
@@ -34,7 +34,7 @@ class BRBot:
             BRBot.Stats = json.loads(f.read())
 
     @staticmethod
-    def UpdateStats(pid: str, win: bool):
+    def UpdateStats(pid: str, win: bool) -> None:
         if pid not in BRBot.Stats:
             BRBot.Stats[pid] = {
                  "Win": 0,
@@ -45,12 +45,12 @@ class BRBot:
             f.write(json.dumps(BRBot.Stats, indent=4))
 
     @Bot.event
-    async def on_ready():
+    async def on_ready() -> None:
         print("im running nigger")
 
     # remember to remove this when bot is finished
     @Bot.command()
-    async def clearstats(ctx):
+    async def clearstats(ctx) -> None:
         if not ctx.author.guild_permissions.administrator:
             return await ctx.reply("You dont have permissions for this command nigger")
         BRBot.Stats = {}
@@ -59,13 +59,13 @@ class BRBot:
         await ctx.reply("Player stats deleted")
 
     @Bot.command(help="Closes the bot")
-    async def exit(ctx: commands.Context):
+    async def exit(ctx: commands.Context) -> None:
         await ctx.send("bye nigger")
         await BRBot.Bot.close()
 
     @Bot.command(name="play", help="Starts a game of Buckshot Roulette")
     @CheckUser
-    async def play(ctx: commands.Context, user: nextcord.Member):
+    async def play(ctx: commands.Context, user: nextcord.Member) -> None:
         if user==ctx.author:
             return await ctx.reply(Settings.Messages.SelfChallenge)
         
@@ -81,7 +81,7 @@ class BRBot:
 
     @Bot.command(name="stats", help="Display player statistics")
     @CheckUser
-    async def stats(ctx: commands.Context, user: nextcord.Member):
+    async def stats(ctx: commands.Context, user: nextcord.Member) -> None:
         menu = BRBot.CreateEmbed(f"{user.name}'s Stats")
         win, lose = [0]*2 if str(user.id) not in BRBot.Stats else BRBot.Stats[str(user.id)].values()
         ratio = win/lose if lose else win
@@ -94,7 +94,7 @@ class BRBot:
 
 BRBot.Bot.remove_command("help")
 @BRBot.Bot.command(help="Shows this message")
-async def help(ctx: commands.Context):
+async def help(ctx: commands.Context) -> None:
     menu = BRBot.CreateEmbed("Commands")
     menu.add_field(name="", value="\n\n".join([f"**{BRBot.CommandPrefix}{i.name}**\n{i.help}" for i in BRBot.Bot.commands]))
     await ctx.send(embed=menu)
