@@ -199,6 +199,7 @@ class Game:
 
         await message.AddButton("Yourself", "🤓", c)
         await message.AddButton(enemy.User.name, "😈", e)
+        await message.AddButton("Back", "↩", self.Buttons.Play)
 
     async def ButtonItem(self, interaction: nextcord.Interaction) -> None:
         await Game.ClearInteraction(interaction)
@@ -215,3 +216,4 @@ class Game:
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2
         for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name==i.Name, player.Items)]]:
             await message.AddButton(item.Name, item.Repr, lambda i: InvokeItem(i, item, player))
+        await message.AddButton("Back", "↩", self.Buttons.Play)
