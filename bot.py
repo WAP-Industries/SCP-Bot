@@ -1,6 +1,6 @@
 from game import *
 import json
-import os
+from os import path, environ
 
 class BRBot:
     CommandPrefix = "?"
@@ -27,7 +27,7 @@ class BRBot:
     
     @staticmethod
     def LoadStats() -> None:
-        if not os.path.exists(BRBot.StatsFile):
+        if not path.exists(BRBot.StatsFile):
             with open(BRBot.StatsFile, "w") as f:
                 f.write(json.dumps({}))
         with open(BRBot.StatsFile) as f:
