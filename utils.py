@@ -10,6 +10,7 @@ class __Message__:
         self.Reference = message
         self.Embed = None
         self.View = nextcord.ui.View()
+        self.Response = None
 
     async def Update(self) -> None:
         await self.Reference.edit(content=Utils.Blank, embed=self.Embed, view=self.View)

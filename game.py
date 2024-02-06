@@ -163,9 +163,14 @@ class Game:
         await self.UpdateDisplay()
 
     async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
+        if self.Message.Response:
+            await self.Message.Response.delete()
+
         if interaction.user!=self.Info.Turn.User:
             return await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
         message = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
+
+        self.Message.Response = message.Reference
         await message.AddButton("Shoot", "🔫", self.Buttons.Shoot)
         await message.AddButton("Item", "🔧", self.Buttons.Item)
 
@@ -180,11 +185,11 @@ class Game:
             self.Message.View.clear_items()
             await self.Message.Update()
 
-        async def c(_):
+        async def c(_) -> None:
             await ClearButton()
             await Game.ClearInteraction(interaction, True)
             await self.Shoot(current)
-        async def e(_):
+        async def e(_) -> None:
             await ClearButton()
             await Game.ClearInteraction(interaction, True)
             await self.Shoot(enemy)
@@ -196,7 +201,7 @@ class Game:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 
-        async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player):
+        async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player) -> None:
             await self.UseItem(interaction, item, player)
             await self.ButtonItem(interaction)
             if not len(self.Info.Gun.Chamber):
