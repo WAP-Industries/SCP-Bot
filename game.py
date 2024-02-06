@@ -52,7 +52,7 @@ class Game:
             await self.UpdateDisplay()
         
         self.Info.Round+=1
-        self.Info.Turn = self.Player1
+        self.Info.Turn = random.choice(self.Players)
 
         await self.UpdateDisplay()
         for i in [
