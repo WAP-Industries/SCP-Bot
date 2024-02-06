@@ -164,7 +164,10 @@ class Game:
 
     async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
         if self.Message.Response:
-            await self.Message.Response.delete()
+            try:
+                await self.Message.Response.delete()
+            except:
+                pass
 
         if interaction.user!=self.Info.Turn.User:
             return await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
