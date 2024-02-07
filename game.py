@@ -52,7 +52,8 @@ class Game:
             await self.UpdateDisplay()
         
         self.Info.Round+=1
-        self.Info.Turn = random.choice(self.Players)
+        # self.Info.Turn = random.choice(self.Players)
+        self.Info.Turn = self.Player1
 
         await self.UpdateDisplay()
         for i in [
@@ -165,17 +166,17 @@ class Game:
     async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
         if self.Message.Response:
             try:
-                await self.Message.Response.delete()
+                await self.Message.Response.Reference.delete()
             except:
                 pass
 
         if interaction.user!=self.Info.Turn.User:
-            return await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
-        message = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
+            self.Message.Response = await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
+            return
+        self.Message.Response = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
 
-        self.Message.Response = message.Reference
-        await message.AddButton("Shoot", "🔫", self.Buttons.Shoot)
-        await message.AddButton("Item", "🔧", self.Buttons.Item)
+        await self.Message.Response.AddButton("Shoot", "🔫", self.Buttons.Shoot)
+        await self.Message.Response.AddButton("Item", "🔧", self.Buttons.Item)
 
     async def ButtonShoot(self, interaction: nextcord.Interaction) -> None:
         await Game.ClearInteraction(interaction)
@@ -183,6 +184,7 @@ class Game:
 
         current = self.Player1 if self.Player1.User==interaction.user else self.Player2
         enemy = self.Player2 if current==self.Player1 else self.Player2
+        print(enemy.User.name)
 
         async def ClearButton():
             self.Message.View.clear_items()
