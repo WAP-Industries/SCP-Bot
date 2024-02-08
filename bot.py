@@ -76,7 +76,7 @@ class BRBot:
         if BRBot.PlayerInGame(user):
             return await ctx.reply(Settings.Messages.AlreadyInGame(f"{user.name} is"))
 
-        game = Game(ctx.author, user, await ctx.send(Game.DebugMessage(Settings.Messages.NewGame)))
+        game = Game(ctx.author, user, await ctx.send(Settings.Messages.NewGame))
         BRBot.Games.append(game)
         await game.StartRound()
 

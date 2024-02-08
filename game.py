@@ -32,10 +32,6 @@ class Game:
             Shoot = self.ButtonShoot
             Item = self.ButtonItem
         self.Buttons = B
-
-    @staticmethod
-    def DebugMessage(text) -> str:
-        return f"`{text}...`"
     
     @staticmethod
     async def ClearInteraction(interaction: nextcord.Interaction) -> None:
@@ -43,7 +39,7 @@ class Game:
             await interaction.response.defer()
         except:
             pass
-        await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
+        await interaction.edit_original_message(content=Settings.Messages.LoadOptions, view=None)
 
     @staticmethod
     async def DeleteInteraction(interaction: nextcord.Interaction) -> None:
@@ -184,7 +180,7 @@ class Game:
         if interaction.user!=self.Info.Turn.User:
             self.Message.Response = await interaction.response.send_message(content=Settings.Messages.NotTurn, ephemeral=True)
             return
-        self.Message.Response = Utils.Message(await interaction.response.send_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), ephemeral=True))
+        self.Message.Response = Utils.Message(await interaction.response.send_message(content=Settings.Messages.LoadOptions, ephemeral=True))
 
         await self.Message.Response.AddButton("Shoot", "🔫", self.Buttons.Shoot)
         await self.Message.Response.AddButton("Item", "🔧", self.Buttons.Item)

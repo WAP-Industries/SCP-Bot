@@ -1,7 +1,7 @@
 class Settings:
     class Messages:
-        NewGame = "Creating game"
-        LoadOptions = "Loading options"
+        NewGame = "`Creating game...`"
+        LoadOptions = "`Loading options...`"
         NotTurn = "Wait for your turn, nigger."
         SelfChallenge = "You can't play against yourself, nigger."
         NoUser = lambda x: f"Member `{x}` doesn't exist, nigger."
