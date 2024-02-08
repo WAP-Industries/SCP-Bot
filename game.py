@@ -38,12 +38,20 @@ class Game:
         return f"`{text}...`"
     
     @staticmethod
-    async def ClearInteraction(interaction: nextcord.Interaction, empty: bool=False) -> None:
+    async def ClearInteraction(interaction: nextcord.Interaction) -> None:
         try:
             await interaction.response.defer()
         except:
             pass
-        await interaction.edit_original_message(content=Utils.Blank if empty else Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
+        await interaction.edit_original_message(content=Game.DebugMessage(Settings.Messages.LoadOptions), view=None)
+
+    @staticmethod
+    async def DeleteInteraction(interaction: nextcord.Interaction) -> None:
+        try:
+            await interaction.response.defer()
+        except:
+            pass
+        await (await interaction.original_message()).delete()
 
     async def StartRound(self) -> None:
         async def LoadGun() -> None:
@@ -182,21 +190,20 @@ class Game:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 
-        current = self.Player1 if self.Player1.User==interaction.user else self.Player2
-        enemy = self.Player2 if current==self.Player1 else self.Player2
-        print(enemy.User.name)
-
+        current = self.Players[self.Player2.User==interaction.user]
+        enemy = self.Players[current==self.Player1]
+        
         async def ClearButton():
             self.Message.View.clear_items()
             await self.Message.Update()
 
         async def c(_) -> None:
             await ClearButton()
-            await Game.ClearInteraction(interaction, True)
+            await Game.DeleteInteraction(interaction)
             await self.Shoot(current)
         async def e(_) -> None:
             await ClearButton()
-            await Game.ClearInteraction(interaction, True)
+            await Game.DeleteInteraction(interaction)
             await self.Shoot(enemy)
 
         await message.AddButton("Yourself", "🤓", c)
