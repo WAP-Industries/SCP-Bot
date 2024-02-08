@@ -11,9 +11,6 @@ class Player:
         self.Health = Settings.PlayerHealth
         self.Items = [Item()]*Settings.MaxItems
         self.Handcuffed = False
-    def OrderItems(self):
-        owned = [*filter(lambda x: x.Name, self.Items)]
-        self.Items = owned+[Item()]*(len(self.Items)-len(owned))
 
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
@@ -166,12 +163,15 @@ class Game:
     async def UseItem(self, interaction: nextcord.Interaction, item: Item, player: Player) -> None:
         await self.UpdateDialogue(f"{player.Name} uses {item.Name}!")
         await sleep(Settings.DialogueInterval)
+
         await item.Callback(player, self, interaction)
         for i in reversed(range(len(player.Items))):
             if player.Items[i].Name==item.Name:
                 player.Items[i] = Item()
                 break
-        player.OrderItems()
+        owned = [*filter(lambda x: x.Name, player.Items)]
+        player.Items = owned+[Item()]*(len(player.Items)-len(owned))
+        
         await self.UpdateDisplay()
 
     async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
