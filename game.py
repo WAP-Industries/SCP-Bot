@@ -63,14 +63,13 @@ class Game:
             await self.UpdateDisplay()
         
         self.Info.Round+=1
-        # self.Info.Turn = random.choice(self.Players)
-        self.Info.Turn = self.Player1
-
+        self.Info.Turn = random.choice(self.Players)
+        
         await self.UpdateDisplay()
         for i in [
             [f"Round {self.Info.Round}", None],
             [
-                lambda: f"{Settings.DrawConfig[self.Info.Round]} items drawn",
+                lambda: f"{Settings.DrawConfig[self.Info.Round if self.Info.Round<len(Settings.DrawConfig) else -1]} items drawn",
                 lambda: self.DrawItems(Settings.DrawConfig[self.Info.Round if self.Info.Round<len(Settings.DrawConfig) else -1])
             ],
             [lambda: f"{self.Info.Gun.Chamber.count(1)} lives. {self.Info.Gun.Chamber.count(0)} blanks.", LoadGun],
