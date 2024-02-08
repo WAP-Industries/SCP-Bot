@@ -11,6 +11,9 @@ class Player:
         self.Health = Settings.PlayerHealth
         self.Items = [Item()]*Settings.MaxItems
         self.Handcuffed = False
+    def OrderItems(self):
+        owned = [*filter(lambda x: x.Name, self.Items)]
+        self.Items = owned+[Item()]*(len(self.Items)-len(owned))
 
 class Game:
     def __init__(self, player1: nextcord.Member, player2: nextcord.Member, message: nextcord.Message):
@@ -169,6 +172,7 @@ class Game:
             if player.Items[i].Name==item.Name:
                 player.Items[i] = Item()
                 break
+        player.OrderItems()
         await self.UpdateDisplay()
 
     async def ButtonPlay(self, interaction: nextcord.Interaction) -> None:
@@ -214,7 +218,8 @@ class Game:
         await Game.ClearInteraction(interaction)
         message = Utils.Message(await interaction.original_message())
 
-        async def InvokeItem(interaction: nextcord.Interaction, item: Item, player: Player) -> None:
+        async def InvokeItem(interaction: nextcord.Interaction, player: Player) -> None:
+            item = [i for i in player.Items if i.Name==interaction.data["custom_id"]][0]
             await self.UseItem(interaction, item, player)
             await self.ButtonItem(interaction)
             if not len(self.Info.Gun.Chamber):
@@ -224,5 +229,5 @@ class Game:
 
         player = self.Player1 if interaction.user==self.Player1.User else self.Player2
         for item in [i for i in Items if i.Name and [*filter(lambda x: x.Name==i.Name, player.Items)]]:
-            await message.AddButton(item.Name, item.Repr, lambda i: InvokeItem(i, item, player))
+            await message.AddButton(item.Name, item.Repr, lambda i: InvokeItem(i, player), item.Name)
         await message.AddButton("Back", "↩", self.Buttons.Play)

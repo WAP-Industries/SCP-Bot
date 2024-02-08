@@ -17,7 +17,8 @@ class BRBot:
         async def wrapper(ctx: commands.Context, user: str) -> None:
             try:
                 return await func(ctx, await commands.MemberConverter().convert(ctx, user))
-            except:
+            except Exception as e:
+                print(e)
                 await ctx.reply(Settings.Messages.NoUser(user))
         return wrapper
 

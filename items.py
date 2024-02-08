@@ -20,7 +20,7 @@ class Item:
         @staticmethod
         async def Cigarette(player, game, interaction) -> None:
             player.Health+=1
-            await game.UpdateDialogue(f"{player.Name} regains 1 Health!")
+            await game.UpdateDialogue(f"{player.Name} gains 1 Health!")
 
         @staticmethod
         async def MagnifyingGlass(player, game, interaction) -> None:
