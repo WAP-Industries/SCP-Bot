@@ -123,8 +123,8 @@ class Game:
         if bullet and self.Info.Gun.Damage>1:
             await sleep(Settings.DialogueInterval)
             await self.UpdateDialogue(f"Sawed-off shotgun deals {self.Info.Gun.Damage} damage!")
-            self.Info.Gun.Damage = 1
-            self.Info.Gun.Multi = 0
+        self.Info.Gun.Damage = 1
+        self.Info.Gun.Multi = 0
         await sleep(Settings.DialogueInterval)
 
         if target.Health<=0:
