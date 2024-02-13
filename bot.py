@@ -49,16 +49,6 @@ class BRBot:
     async def on_ready() -> None:
         print("im running nigger")
 
-    # remember to remove this when bot is finished
-    @Bot.command()
-    async def clearstats(ctx) -> None:
-        if not ctx.author.guild_permissions.administrator:
-            return await ctx.reply("You dont have permissions for this command nigger")
-        BRBot.Stats = {}
-        with open(BRBot.StatsFile, "w") as f:
-            f.write(json.dumps({}))
-        await ctx.reply("Player stats deleted")
-
     @Bot.command(help="Closes the bot")
     async def exit(ctx: commands.Context) -> None:
         await ctx.send("bye nigger")
