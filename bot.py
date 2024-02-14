@@ -49,11 +49,6 @@ class BRBot:
     async def on_ready() -> None:
         print("im running nigger")
 
-    @Bot.command(help="Closes the bot")
-    async def exit(ctx: commands.Context) -> None:
-        await ctx.send("bye nigger")
-        await BRBot.Bot.close()
-
     @Bot.command(name="play", help="Starts a game of Buckshot Roulette")
     @CheckUser
     async def play(ctx: commands.Context, user: nextcord.Member) -> None:
