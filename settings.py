@@ -2,10 +2,10 @@ class Settings:
     class Messages:
         NewGame = "`Creating game...`"
         LoadOptions = "`Loading options...`"
-        NotTurn = "Wait for your turn, nigger."
-        SelfChallenge = "You can't play against yourself, nigger."
-        NoUser = lambda x: f"Member `{x}` doesn't exist, nigger."
-        AlreadyInGame = lambda x: f"{x} already in a game, nigger."
+        NotTurn = "Wait for your turn."
+        SelfChallenge = "You can't play against yourself."
+        NoUser = lambda x: f"Member `{x}` doesn't exist."
+        AlreadyInGame = lambda x: f"{x} already in a game."
 
     DialogueInterval = 1
     
