@@ -47,7 +47,7 @@ class BRBot:
 
     @Bot.event
     async def on_ready() -> None:
-        print("im running nigger")
+        print("im running")
 
     @Bot.command(name="play", help="Starts a game of Buckshot Roulette")
     @CheckUser
